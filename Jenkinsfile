@@ -15,43 +15,43 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'cd backend/auth-service && npm install'
-                sh 'cd backend/doctor-service && npm install'
-                sh 'cd backend/appointment-service && npm install'
+                bat 'cd backend\\auth-service && npm install'
+                bat 'cd backend\\doctor-service && npm install'
+                bat 'cd backend\\appointment-service && npm install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'cd backend/auth-service && npm test'
-                sh 'cd backend/doctor-service && npm test'
-                sh 'cd backend/appointment-service && npm test'
+                bat 'cd backend\\auth-service && npm test'
+                bat 'cd backend\\doctor-service && npm test'
+                bat 'cd backend\\appointment-service && npm test'
             }
         }
 
         stage('Build Docker Images') {
             steps {
-                sh 'docker build -t ${DOCKER_HUB}/auth-service ./backend/auth-service'
-                sh 'docker build -t ${DOCKER_HUB}/doctor-service ./backend/doctor-service'
-                sh 'docker build -t ${DOCKER_HUB}/appointment-service ./backend/appointment-service'
+                bat 'docker build -t %DOCKER_HUB%/auth-service ./backend/auth-service'
+                bat 'docker build -t %DOCKER_HUB%/doctor-service ./backend/doctor-service'
+                bat 'docker build -t %DOCKER_HUB%/appointment-service ./backend/appointment-service'
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
-                    sh 'echo $DOCKER_TOKEN | docker login -u ${DOCKER_HUB} --password-stdin'
-                    sh 'docker push ${DOCKER_HUB}/auth-service'
-                    sh 'docker push ${DOCKER_HUB}/doctor-service'
-                    sh 'docker push ${DOCKER_HUB}/appointment-service'
+                    bat 'echo %DOCKER_TOKEN% | docker login -u %DOCKER_HUB% --password-stdin'
+                    bat 'docker push %DOCKER_HUB%/auth-service'
+                    bat 'docker push %DOCKER_HUB%/doctor-service'
+                    bat 'docker push %DOCKER_HUB%/appointment-service'
                 }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d'
+                bat 'docker-compose down || exit 0'
+                bat 'docker-compose up -d'
             }
         }
     }
