@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  auth-service:
+    image: navadeep81/auth-service:latest
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+      - MONGO_URI=mongodb://mongo:27017/authdb
+    depends_on:
+      - mongo
+
+  doctor-service:
+    image: navadeep81/doctor-service:latest
+    restart: unless-stopped
+    ports:
+      - "5002:5002"
+    environment:
+      - PORT=5002
+      - MONGO_URI=mongodb://mongo:27017/doctordb
+    depends_on:
+      - mongo
+
+  appointment-service:
+    image: navadeep81/appointment-service:latest
+    restart: unless-stopped
+    ports:
+      - "5003:5003"
+    environment:
+      - PORT=5003
+      - MONGO_URI=mongodb://mongo:27017/appointmentdb
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+
+volumes:
+  mongo-data:
