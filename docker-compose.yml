@@ -1,60 +1,60 @@
-
-
+# ✅ Hospital Appointment System - Docker Compose (Final Version)
 services:
+  mongo:
+    image: mongo:latest
+    container_name: hospital_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - hospital_network
+
   auth-service:
     image: navadeep81/auth-service:latest
-    restart: unless-stopped
+    container_name: auth_service
+    restart: always
     ports:
-      - "5001:5001"
+      - "5101:5001"
     environment:
-      - PORT=5001
-      - MONGO_URI=mongodb://mongo:27017/authdb
+      - MONGO_URL=mongodb://mongo:27017/hospital_auth
+      - SERVICE_NAME=auth-service
     depends_on:
       - mongo
+    networks:
+      - hospital_network
 
   doctor-service:
     image: navadeep81/doctor-service:latest
-    restart: unless-stopped
+    container_name: doctor_service
+    restart: always
     ports:
-      - "5002:5002"
+      - "5102:5002"
     environment:
-      - PORT=5002
-      - MONGO_URI=mongodb://mongo:27017/doctordb
+      - MONGO_URL=mongodb://mongo:27017/hospital_doctors
+      - SERVICE_NAME=doctor-service
     depends_on:
       - mongo
+    networks:
+      - hospital_network
 
   appointment-service:
     image: navadeep81/appointment-service:latest
-    restart: unless-stopped
+    container_name: appointment_service
+    restart: always
     ports:
-      - "5003:5003"
+      - "5103:5003"
     environment:
-      - PORT=5003
-      - MONGO_URI=mongodb://mongo:27017/appointmentdb
+      - MONGO_URL=mongodb://mongo:27017/hospital_appointments
+      - SERVICE_NAME=appointment-service
     depends_on:
       - mongo
+    networks:
+      - hospital_network
 
-  mongo:
-    image: mongo:6.0
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
-    ports:
-      - "27017:27017"
+networks:
+  hospital_network:
 
 volumes:
-  mongo-data:
-auth-service:
-    build: ./backend/auth-service
-    ports:
-      - "5101:5001"
-
-    doctor-service:
-      build: ./backend/doctor-service
-      ports:
-        - "5102:5002"
-
-    appointment-service:
-      build: ./backend/appointment-service
-      ports:
-        - "5103:5003"
+  mongo_data:
