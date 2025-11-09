@@ -41,3 +41,14 @@ services:
 
 volumes:
   mongo-data:
+auth-service:
+    ports:
+      - "5101:5001"
+
+  doctor-service:
+    ports:
+      - "5102:5002"
+
+  appointment-service:
+    ports:
+      - "5103:5003"
