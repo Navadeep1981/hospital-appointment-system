@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   mongo:
-    image: mongo:6.0
+    image: mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -42,13 +42,16 @@ services:
 volumes:
   mongo-data:
 auth-service:
+    build: ./backend/auth-service
     ports:
-      - "5101:5001"
+      - "5101:5001"   # changed from 5001
 
   doctor-service:
+    build: ./backend/doctor-service
     ports:
-      - "5102:5002"
+      - "5102:5002"   # changed from 5002
 
   appointment-service:
+    build: ./backend/appointment-service
     ports:
-      - "5103:5003"
+      - "5103:5003"   # changed from 5003
