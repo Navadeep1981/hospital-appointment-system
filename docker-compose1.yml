@@ -1,57 +1,77 @@
-version: "3.8"
+# Hospital Appointment System - Docker Compose
+# Compatible with Docker Compose V2 (no "version" field needed)
 
 services:
+  # ------------------------------
+  # MongoDB Database
+  # ------------------------------
   mongo:
-    image: mongo
-    restart: unless-stopped
+    image: mongo:latest
+    container_name: hospital_mongo
+    restart: always
     ports:
       - "27017:27017"
     volumes:
-      - mongo-data:/data/db
+      - mongo_data:/data/db
+    networks:
+      - hospital_network
 
+  # ------------------------------
+  # Authentication Service
+  # ------------------------------
   auth-service:
-    image: navadeep81/auth-service:latest
-    ports:
-      - "5001:5001"
-    environment:
-      - PORT=5001
-      - MONGO_URI=mongodb://mongo:27017/authdb
-    depends_on:
-      - mongo
-
-  doctor-service:
-    image: navadeep81/doctor-service:latest
-    ports:
-      - "5002:5002"
-    environment:
-      - PORT=5002
-      - MONGO_URI=mongodb://mongo:27017/doctordb
-    depends_on:
-      - mongo
-
-  appointment-service:
-    image: navadeep81/appointment-service:latest
-    ports:
-      - "5003:5003"
-    environment:
-      - PORT=5003
-      - MONGO_URI=mongodb://mongo:27017/appointmentdb
-    depends_on:
-      - mongo
-
-volumes:
-  mongo-data:
-auth-service:
     build: ./backend/auth-service
+    container_name: auth_service
+    restart: always
     ports:
-      - "5101:5001"   # changed from 5001
+      - "5101:5001"     # Host:Container port mapping
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hospital_auth
+      - SERVICE_NAME=auth-service
+    depends_on:
+      - mongo
+    networks:
+      - hospital_network
 
+  # ------------------------------
+  # Doctor Service
+  # ------------------------------
   doctor-service:
     build: ./backend/doctor-service
+    container_name: doctor_service
+    restart: always
     ports:
-      - "5102:5002"   # changed from 5002
+      - "5102:5002"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hospital_doctors
+      - SERVICE_NAME=doctor-service
+    depends_on:
+      - mongo
+    networks:
+      - hospital_network
 
+  # ------------------------------
+  # Appointment Service
+  # ------------------------------
   appointment-service:
     build: ./backend/appointment-service
+    container_name: appointment_service
+    restart: always
     ports:
-      - "5103:5003"   # changed from 5003
+      - "5103:5003"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/hospital_appointments
+      - SERVICE_NAME=appointment-service
+    depends_on:
+      - mongo
+    networks:
+      - hospital_network
+
+# ------------------------------
+# Shared Network and Volume
+# ------------------------------
+networks:
+  hospital_network:
+
+volumes:
+  mongo_data:
