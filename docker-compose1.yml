@@ -1,10 +1,6 @@
-# Hospital Appointment System - Docker Compose
-# Compatible with Docker Compose V2 (no "version" field needed)
+# Hospital Appointment System - Docker Compose (Final, Port Conflict Fixed)
 
 services:
-  # ------------------------------
-  # MongoDB Database
-  # ------------------------------
   mongo:
     image: mongo:latest
     container_name: hospital_mongo
@@ -16,15 +12,12 @@ services:
     networks:
       - hospital_network
 
-  # ------------------------------
-  # Authentication Service
-  # ------------------------------
   auth-service:
     build: ./backend/auth-service
     container_name: auth_service
     restart: always
     ports:
-      - "5101:5001"     # Host:Container port mapping
+      - "5101:5001"
     environment:
       - MONGO_URL=mongodb://mongo:27017/hospital_auth
       - SERVICE_NAME=auth-service
@@ -33,9 +26,6 @@ services:
     networks:
       - hospital_network
 
-  # ------------------------------
-  # Doctor Service
-  # ------------------------------
   doctor-service:
     build: ./backend/doctor-service
     container_name: doctor_service
@@ -50,9 +40,6 @@ services:
     networks:
       - hospital_network
 
-  # ------------------------------
-  # Appointment Service
-  # ------------------------------
   appointment-service:
     build: ./backend/appointment-service
     container_name: appointment_service
@@ -67,9 +54,6 @@ services:
     networks:
       - hospital_network
 
-# ------------------------------
-# Shared Network and Volume
-# ------------------------------
 networks:
   hospital_network:
 
