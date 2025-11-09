@@ -31,10 +31,15 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                bat 'docker build -t %DOCKER_HUB%/auth-service ./backend/auth-service'
-                bat 'docker build -t %DOCKER_HUB%/doctor-service ./backend/doctor-service'
-                bat 'docker build -t %DOCKER_HUB%/appointment-service ./backend/appointment-service'
-            }
+        withCredentials([string(credentialsId: 'dockerhub-token', variable: 'DOCKER_TOKEN')]) {
+            bat '''
+                echo %DOCKER_TOKEN% | docker login -u navadeep81 --password-stdin
+                docker build -t navadeep81/auth-service ./backend/auth-service
+                docker build -t navadeep81/doctor-service ./backend/doctor-service
+                docker build -t navadeep81/appointment-service ./backend/appointment-service
+            '''
+        }
+    }
         }
 
         stage('Push to Docker Hub') {
