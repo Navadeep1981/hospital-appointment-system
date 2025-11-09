@@ -1,4 +1,4 @@
-version: "3.8"
+
 
 services:
   auth-service:
@@ -44,3 +44,17 @@ services:
 
 volumes:
   mongo-data:
+auth-service:
+    build: ./backend/auth-service
+    ports:
+      - "5101:5001"
+
+    doctor-service:
+      build: ./backend/doctor-service
+      ports:
+        - "5102:5002"
+
+    appointment-service:
+      build: ./backend/appointment-service
+      ports:
+        - "5103:5003"
