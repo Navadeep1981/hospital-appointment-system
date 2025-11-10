@@ -1,5 +1,8 @@
 // Base URL for backend (Auth Service)
-const API_BASE = "http://localhost:5001/api/auth";
+const API_BASE = "http://localhost:5101/api/auth";
+const BASE_URL_AUTH = "http://localhost:5101/api";
+const BASE_URL_DOCTOR = "http://localhost:5102/api";
+const BASE_URL_APPOINTMENT = "http://localhost:5103/api";
 
 // ---------------------- REGISTER ----------------------
 const registerForm = document.getElementById("registerForm");
@@ -69,7 +72,7 @@ if (loginForm) {
 window.addEventListener("DOMContentLoaded", async () => {
   const doctorSelect = document.getElementById("doctor");
   try {
-    const res = await fetch("http://localhost:5002/api/doctors");
+    const res = await fetch("http://localhost:5102/api/doctors");
     const doctors = await res.json();
 
     doctors.forEach((doc) => {
@@ -98,7 +101,7 @@ document.getElementById("appointmentForm").addEventListener("submit", async (e) 
   };
 
   try {
-    const res = await fetch("http://localhost:5003/api/appointments", {
+    const res = await fetch("http://localhost:5103/api/appointments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)

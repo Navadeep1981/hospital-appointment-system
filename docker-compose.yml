@@ -1,60 +1,65 @@
-# ✅ Hospital Appointment System - Docker Compose (Final Version)
+version: "3.9"
+
 services:
   mongo:
     image: mongo:latest
     container_name: hospital_mongo
-    restart: always
     ports:
       - "27017:27017"
     volumes:
-      - mongo_data:/data/db
-    networks:
-      - hospital_network
+      - mongo-data:/data/db
 
-  auth-service:
-    image: navadeep81/auth-service:latest
+  auth_service:
+    build:
+      context: ./backend/auth-service
+      dockerfile: Dockerfile
     container_name: auth_service
-    restart: always
     ports:
       - "5101:5001"
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/hospital_auth
-      - SERVICE_NAME=auth-service
     depends_on:
       - mongo
-    networks:
-      - hospital_network
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/hospitaldb
 
-  doctor-service:
-    image: navadeep81/doctor-service:latest
+  doctor_service:
+    build:
+      context: ./backend/doctor-service
+      dockerfile: Dockerfile
     container_name: doctor_service
-    restart: always
     ports:
       - "5102:5002"
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/hospital_doctors
-      - SERVICE_NAME=doctor-service
     depends_on:
       - mongo
-    networks:
-      - hospital_network
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/hospitaldb
 
-  appointment-service:
-    image: navadeep81/appointment-service:latest
+  appointment_service:
+    build:
+      context: ./backend/appointment-service
+      dockerfile: Dockerfile
     container_name: appointment_service
-    restart: always
     ports:
       - "5103:5003"
-    environment:
-      - MONGO_URL=mongodb://mongo:27017/hospital_appointments
-      - SERVICE_NAME=appointment-service
     depends_on:
       - mongo
-    networks:
-      - hospital_network
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/hospitaldb
 
-networks:
-  hospital_network:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - auth_service
+      - doctor_service
+      - appointment_service
+    environment:
+      - AUTH_SERVICE_URL=http://auth_service:5001
+      - DOCTOR_SERVICE_URL=http://doctor_service:5002
+      - APPOINTMENT_SERVICE_URL=http://appointment_service:5003
 
 volumes:
-  mongo_data:
+  mongo-data:

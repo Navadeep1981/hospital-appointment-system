@@ -1,18 +1,21 @@
-# Use Node.js base image
+# Use Node 18 Alpine base image
 FROM node:18-alpine
 
-# Set working directory
+# Create app directory
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Copy package files first
 COPY package*.json ./
+
+# Install dependencies (include nodemon globally for dev)
+RUN npm install -g nodemon
 RUN npm install
 
-# Copy the rest of the app
+# Copy rest of the files
 COPY . .
 
-# Expose port
+# Expose the service port
 EXPOSE 5002
 
-# Run the service
-CMD ["npm", "start"]
+# Start the service
+CMD ["node", "server.js"]
